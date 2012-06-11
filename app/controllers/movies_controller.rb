@@ -8,28 +8,21 @@ class MoviesController < ApplicationController
 
   def index
 
-    if session[:sort_col]
-      puts "session[:sort_col]=" + session[:sort_col] + "."
-    end
-    if params[:sort_col]
-      puts "params[:sort_col]=" + params[:sort_col] + "."
+    if (!params[:sort_col])&&session[:sort_col]
+      @sort_col = session[:sort_col]
+      if session[:ratings]
+        @user_selected_ratings= eval session[:ratings]
+      end
+      flash.keep
+      redirect_to movies_path :sort_col => @sort_col, :ratings => @user_selected_ratings
     end
 
     # determine which column to sort by
     user_sort_col = params[:sort_col]
     if ((user_sort_col == "title")||(user_sort_col == "release_date")) then
       @sort_col = user_sort_col
-      puts "@sort_col from params"
     else
-      if session[:sort_col]
-        @sort_col = session[:sort_col]
-        puts "@sort_col from session"
-        redirect_to movies_path :sort_col => @sort_col
-      end
-      if !@sort_col
-        @sort_col = "title"
-        puts "@sort_col from default"
-      end
+      @sort_col = "title"
     end
 
     @all_ratings = Movie.all_ratings_method
@@ -42,7 +35,7 @@ class MoviesController < ApplicationController
     end
 
     session[:sort_col] = @sort_col
-    session[:user_selected_ratings] = @user_selected_ratings
+    session[:ratings] = @user_selected_ratings.to_s
 
     @movies = Movie.find(:all, :order => @sort_col + " ASC", :conditions => [ "rating IN (?)", selected_ratings] )
   end
