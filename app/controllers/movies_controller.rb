@@ -8,14 +8,22 @@ class MoviesController < ApplicationController
 
   def index
     # determine which column to sort by
-    user_sort_col = params[:sort_col]
+    user_sort_col = params[:hidden_sort_col]
     if ((user_sort_col == "title")||(user_sort_col == "release_date")) then
       @sort_col = user_sort_col
     else
       @sort_col = "title"
     end
 
-    @movies = Movie.all(:order => @sort_col + " ASC")
+    @all_ratings = Movie.all_ratings_method
+    @user_selected_ratings = (params[:ratings])
+    if (@user_selected_ratings) then
+      selected_ratings = params[:ratings].keys
+    else
+      @user_selected_ratings = { }
+      selected_ratings = @all_ratings
+    end
+    @movies = Movie.find(:all, :order => @sort_col + " ASC", :conditions => [ "rating IN (?)", selected_ratings] )
   end
 
   def new
