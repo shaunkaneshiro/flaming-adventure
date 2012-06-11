@@ -7,7 +7,15 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    # determine which column to sort by
+    user_sort_col = params[:sort_col]
+    if ((user_sort_col == "title")||(user_sort_col == "release_date")) then
+      @sort_col = user_sort_col
+    else
+      @sort_col = "title"
+    end
+
+    @movies = Movie.all(:order => @sort_col + " ASC")
   end
 
   def new
