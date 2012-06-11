@@ -8,7 +8,7 @@ class MoviesController < ApplicationController
 
   def index
     # determine which column to sort by
-    user_sort_col = params[:hidden_sort_col]
+    user_sort_col = params[:sort_col]
     if ((user_sort_col == "title")||(user_sort_col == "release_date")) then
       @sort_col = user_sort_col
     else
